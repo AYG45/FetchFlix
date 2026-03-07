@@ -76,7 +76,7 @@ function App() {
     <div className="app">
       <header className="header">
         <h1 className="title" onClick={loadPopularAnime} style={{ cursor: 'pointer' }}>
-          FETCHFLEX
+          FETCHFLIX
         </h1>
         <SearchBar onSearch={handleSearch} />
       </header>

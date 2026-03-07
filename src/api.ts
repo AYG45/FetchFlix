@@ -1,5 +1,4 @@
 const JIKAN_API = 'https://api.jikan.moe/v4';
-const TMDB_API_KEY = '8265bd1679663a7ea12ac168da84d2e8';
 const CORS_PROXY = 'https://corsproxy.io/?';
 
 // Transform Jikan anime data to our format
@@ -53,8 +52,7 @@ export const getTMDBIdFromMAL = async (malId: number): Promise<number | null> =>
 
 export const searchTMDBByTitle = async (title: string): Promise<number | null> => {
   try {
-    const url = `https://api.themoviedb.org/3/search/tv?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(title)}`;
-    const response = await fetch(CORS_PROXY + encodeURIComponent(url));
+    const response = await fetch(`/api/proxy?query=${encodeURIComponent(title)}`);
     
     if (!response.ok) return null;
     
@@ -69,8 +67,7 @@ export const searchTMDBByTitle = async (title: string): Promise<number | null> =
     // Try simplified title
     const simplified = title.split(':')[0].split('-')[0].replace(/[^\w\s]/g, '').trim();
     if (simplified !== title) {
-      const url2 = `https://api.themoviedb.org/3/search/tv?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(simplified)}`;
-      const response2 = await fetch(CORS_PROXY + encodeURIComponent(url2));
+      const response2 = await fetch(`/api/proxy?query=${encodeURIComponent(simplified)}`);
       
       if (response2.ok) {
         const data2 = await response2.json();

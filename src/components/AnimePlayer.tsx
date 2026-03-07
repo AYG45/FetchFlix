@@ -199,9 +199,6 @@ export const AnimePlayer = ({ tmdbId: malId, title, onClose }: AnimePlayerProps)
           </div>
         </div>
 
-        <div className="video-info">
-          <p>Powered by embed players • Multiple sources available</p>
-        </div>
       </div>
     </div>
   );

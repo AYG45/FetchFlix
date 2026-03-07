@@ -1,4 +1,4 @@
-# FetchFlex - Anime Streaming Platform
+# FetchFlix - Anime Streaming Platform
 
 A simple anime streaming site built with React and TypeScript.
 

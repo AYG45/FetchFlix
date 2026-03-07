@@ -1,5 +1,4 @@
 const JIKAN_API = 'https://api.jikan.moe/v4';
-const CORS_PROXY = 'https://corsproxy.io/?';
 
 // Transform Jikan anime data to our format
 const transformAnime = (anime: any) => ({

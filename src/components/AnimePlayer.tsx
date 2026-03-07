@@ -9,11 +9,11 @@ interface AnimePlayerProps {
 }
 
 const EMBED_SOURCES = [
-  { name: 'VsEmbed', url: (tmdb: number, s: number, e: number) => `https://vsembed.ru/embed/tv/${tmdb}/${s}/${e}` },
-  { name: 'VsEmbed Alt', url: (tmdb: number, s: number, e: number) => `https://vsembed.su/embed/tv/${tmdb}/${s}/${e}` },
   { name: 'VidSrc CC', url: (tmdb: number, s: number, e: number) => `https://vidsrc.cc/v2/embed/tv/${tmdb}/${s}/${e}` },
   { name: 'Embed.su', url: (tmdb: number, s: number, e: number) => `https://embed.su/embed/tv/${tmdb}/${s}/${e}` },
   { name: '2Embed', url: (tmdb: number, s: number, e: number) => `https://www.2embed.cc/embedtv/${tmdb}&s=${s}&e=${e}` },
+  { name: 'VsEmbed', url: (tmdb: number, s: number, e: number) => `https://vsembed.ru/embed/tv/${tmdb}/${s}/${e}` },
+  { name: 'VsEmbed Alt', url: (tmdb: number, s: number, e: number) => `https://vsembed.su/embed/tv/${tmdb}/${s}/${e}` },
 ];
 
 export const AnimePlayer = ({ tmdbId: malId, title, onClose }: AnimePlayerProps) => {
@@ -188,8 +188,8 @@ export const AnimePlayer = ({ tmdbId: malId, title, onClose }: AnimePlayerProps)
                 <iframe
                   src={streamUrl}
                   className="anime-video"
-                  allowFullScreen
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                  allowFullScreen
                   referrerPolicy="origin"
                   sandbox="allow-scripts allow-same-origin allow-presentation"
                 />

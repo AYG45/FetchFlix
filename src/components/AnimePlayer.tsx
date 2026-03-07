@@ -191,7 +191,6 @@ export const AnimePlayer = ({ tmdbId: malId, title, onClose }: AnimePlayerProps)
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                   allowFullScreen
                   referrerPolicy="origin"
-                  sandbox="allow-scripts allow-same-origin allow-presentation"
                 />
               </div>
             ) : (

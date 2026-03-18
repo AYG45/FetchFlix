@@ -3,9 +3,15 @@ import './App.css';
 import { SearchBar } from './components/SearchBar';
 import { MovieGrid } from './components/MovieGrid';
 import { AnimePlayer } from './components/AnimePlayer';
+import { Auth } from './components/Auth';
 import { fetchPopularAnime, fetchTrendingAnime, searchAnime } from './api';
 import { addToRecentlyWatched, getRecentlyWatched } from './utils/storage';
 import type { Movie } from './types';
+
+interface User {
+  email: string;
+  name: string;
+}
 
 function App() {
   const [anime, setAnime] = useState<Movie[]>([]);
@@ -14,8 +20,16 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedAnime, setSelectedAnime] = useState<Movie | null>(null);
   const [activeTab, setActiveTab] = useState<'popular' | 'trending'>('popular');
+  const [user, setUser] = useState<User | null>(null);
+  const [showAuth, setShowAuth] = useState(false);
 
   useEffect(() => {
+    // Check for existing user session
+    const savedUser = localStorage.getItem('fetchflix_user');
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+    
     loadPopularAnime();
     setRecentlyWatched(getRecentlyWatched());
   }, []);
@@ -72,13 +86,35 @@ function App() {
     setSelectedAnime(null);
   };
 
+  const handleLogin = (userData: User) => {
+    setUser(userData);
+    setShowAuth(false);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('fetchflix_user');
+    setUser(null);
+  };
+
   return (
     <div className="app">
       <header className="header">
         <h1 className="title" onClick={loadPopularAnime} style={{ cursor: 'pointer' }}>
           FETCHFLIX
         </h1>
-        <SearchBar onSearch={handleSearch} />
+        <div className="header-right">
+          <SearchBar onSearch={handleSearch} />
+          {user ? (
+            <div className="user-menu">
+              <span className="user-name">Hi, {user.name}</span>
+              <button className="logout-btn" onClick={handleLogout}>Logout</button>
+            </div>
+          ) : (
+            <button className="login-btn" onClick={() => setShowAuth(true)}>
+              Sign In
+            </button>
+          )}
+        </div>
       </header>
       
       <main className="main">
@@ -132,6 +168,13 @@ function App() {
           tmdbId={selectedAnime.id}
           title={selectedAnime.title}
           onClose={handleClosePlayer}
+        />
+      )}
+
+      {showAuth && (
+        <Auth
+          onLogin={handleLogin}
+          onClose={() => setShowAuth(false)}
         />
       )}
     </div>

@@ -6,10 +6,8 @@ const MAX_RECENT_ITEMS = 10;
 export const addToRecentlyWatched = (movie: Movie) => {
   const recent = getRecentlyWatched();
   
-  // Remove if already exists
   const filtered = recent.filter(m => m.id !== movie.id);
   
-  // Add to beginning
   const updated = [movie, ...filtered].slice(0, MAX_RECENT_ITEMS);
   
   localStorage.setItem(RECENTLY_WATCHED_KEY, JSON.stringify(updated));

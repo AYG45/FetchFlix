@@ -6,6 +6,7 @@ import { AnimePlayer } from './components/AnimePlayer';
 import { Auth } from './components/Auth';
 import { fetchPopularAnime, fetchTrendingAnime, searchAnime } from './api';
 import { addToRecentlyWatched, getRecentlyWatched } from './utils/storage';
+import { addToWishlist, removeFromWishlist, getWishlist, isInWishlist } from './utils/wishlist';
 import type { Movie } from './types';
 
 interface User {
@@ -16,10 +17,11 @@ interface User {
 function App() {
   const [anime, setAnime] = useState<Movie[]>([]);
   const [recentlyWatched, setRecentlyWatched] = useState<Movie[]>([]);
+  const [wishlist, setWishlist] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedAnime, setSelectedAnime] = useState<Movie | null>(null);
-  const [activeTab, setActiveTab] = useState<'popular' | 'trending'>('popular');
+  const [activeTab, setActiveTab] = useState<'popular' | 'trending' | 'wishlist'>('popular');
   const [user, setUser] = useState<User | null>(null);
   const [showAuth, setShowAuth] = useState(false);
 
@@ -27,7 +29,9 @@ function App() {
     // Check for existing user session
     const savedUser = localStorage.getItem('fetchflix_user');
     if (savedUser) {
-      setUser(JSON.parse(savedUser));
+      const userData = JSON.parse(savedUser);
+      setUser(userData);
+      setWishlist(getWishlist(userData.email));
     }
     
     loadPopularAnime();
@@ -62,6 +66,16 @@ function App() {
     }
   };
 
+  const loadWishlist = () => {
+    if (user) {
+      const userWishlist = getWishlist(user.email);
+      setAnime(userWishlist);
+      setSearchQuery('');
+      setActiveTab('wishlist');
+      setLoading(false);
+    }
+  };
+
   const handleSearch = async (query: string) => {
     setLoading(true);
     setSearchQuery(query);
@@ -88,12 +102,41 @@ function App() {
 
   const handleLogin = (userData: User) => {
     setUser(userData);
+    setWishlist(getWishlist(userData.email));
     setShowAuth(false);
   };
 
   const handleLogout = () => {
     localStorage.removeItem('fetchflix_user');
     setUser(null);
+    setWishlist([]);
+    if (activeTab === 'wishlist') {
+      loadPopularAnime();
+    }
+  };
+
+  const handleWishlist = (movie: Movie) => {
+    if (!user) return;
+    
+    const isCurrentlyWishlisted = isInWishlist(user.email, movie.id);
+    
+    if (isCurrentlyWishlisted) {
+      removeFromWishlist(user.email, movie.id);
+    } else {
+      addToWishlist(user.email, movie);
+    }
+    
+    const updatedWishlist = getWishlist(user.email);
+    setWishlist(updatedWishlist);
+    
+    // If we're currently viewing the wishlist, update the displayed anime
+    if (activeTab === 'wishlist') {
+      setAnime(updatedWishlist);
+    }
+  };
+
+  const checkIsWishlisted = (movieId: number): boolean => {
+    return user ? isInWishlist(user.email, movieId) : false;
   };
 
   return (
@@ -137,6 +180,18 @@ function App() {
                   <div className="small-card-overlay">
                     <span className="play-icon">▶</span>
                   </div>
+                  {user && (
+                    <button 
+                      className={`wishlist-btn small ${checkIsWishlisted(anime.id) ? 'wishlisted' : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleWishlist(anime);
+                      }}
+                      title={checkIsWishlisted(anime.id) ? 'Remove from wishlist' : 'Add to wishlist'}
+                    >
+                      {checkIsWishlisted(anime.id) ? '❤️' : '🤍'}
+                    </button>
+                  )}
                 </div>
               ))}
             </div>
@@ -157,10 +212,25 @@ function App() {
             >
               Trending Anime
             </button>
+            {user && (
+              <button 
+                className={`tab ${activeTab === 'wishlist' ? 'active' : ''}`}
+                onClick={loadWishlist}
+              >
+                My Wishlist ({wishlist.length})
+              </button>
+            )}
           </div>
         )}
 
-        <MovieGrid movies={anime} loading={loading} onPlay={handlePlayAnime} />
+        <MovieGrid 
+          movies={anime} 
+          loading={loading} 
+          onPlay={handlePlayAnime}
+          onWishlist={user ? handleWishlist : undefined}
+          isWishlisted={checkIsWishlisted}
+          showWishlist={!!user}
+        />
       </main>
 
       {selectedAnime && (

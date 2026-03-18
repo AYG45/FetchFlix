@@ -3,9 +3,12 @@ import type { Movie } from '../types';
 interface MovieCardProps {
   movie: Movie;
   onPlay: (movie: Movie) => void;
+  onWishlist?: (movie: Movie) => void;
+  isWishlisted?: boolean;
+  showWishlist?: boolean;
 }
 
-export const MovieCard = ({ movie, onPlay }: MovieCardProps) => (
+export const MovieCard = ({ movie, onPlay, onWishlist, isWishlisted, showWishlist }: MovieCardProps) => (
   <div className="movie-card">
     <div className="movie-poster">
       {movie.poster_path ? (
@@ -16,6 +19,18 @@ export const MovieCard = ({ movie, onPlay }: MovieCardProps) => (
       <div className="play-overlay" onClick={() => onPlay(movie)}>
         <div className="play-button">▶</div>
       </div>
+      {showWishlist && onWishlist && (
+        <button 
+          className={`wishlist-btn ${isWishlisted ? 'wishlisted' : ''}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            onWishlist(movie);
+          }}
+          title={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+        >
+          {isWishlisted ? '❤️' : '🤍'}
+        </button>
+      )}
     </div>
     <div className="movie-info">
       <h3 className="movie-title">{movie.title}</h3>
